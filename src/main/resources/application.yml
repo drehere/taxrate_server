@@ -1,0 +1,10 @@
+server:
+  port: 8089
+  ssl:
+    key-store: classpath:keystore.p12
+    key-store-password: bitmain
+    key-store-type: PKCS12
+    keyAlias: bitmain
+    key-password: bitmain
+  servlet:
+    path: /tax
