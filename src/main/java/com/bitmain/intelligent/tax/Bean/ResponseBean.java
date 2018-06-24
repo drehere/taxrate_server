@@ -8,6 +8,11 @@ public class ResponseBean<T> {
     public ResponseBean() {
     }
 
+    public ResponseBean(int status, String message) {
+        this.status = status;
+        this.message = message;
+    }
+
     public ResponseBean(T data) {
         this.data = data;
     }
@@ -37,6 +42,11 @@ public class ResponseBean<T> {
     }
 
     public static <T> ResponseBean newSuccess(T data) {
-        return new ResponseBean(data);
+        ResponseBean responseBean=new ResponseBean(data);
+        responseBean.setMessage("ok");
+        return responseBean;
+    }
+    public static <T> ResponseBean newError(int status,String message) {
+        return new ResponseBean(status,message);
     }
 }

@@ -1,10 +1,36 @@
+
+
+#服务器
 server:
   port: 8089
-  ssl:
-    key-store: classpath:keystore.p12
-    key-store-password: bitmain
-    key-store-type: PKCS12
-    keyAlias: bitmain
-    key-password: bitmain
+#  ssl:
+#    key-store: classpath:keystore.p12
+#    key-store-password: bitmain
+#    key-store-type: PKCS12
+#    keyAlias: bitmain
+#    key-password: bitmain
   servlet:
-    path: /tax
+    path: /bitmain
+
+#数据库
+mybatis:
+  type-aliases-package: com.bitmain.intelligent.tax.database
+  configuration:
+    map-underscore-to-camel-case: true
+    auto-mapping-behavior: full
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    username: root
+    password: root
+    url: jdbc:mysql://localhost:3306/bitmain?useUnicode=true&characterEncoding=utf-8
+
+#appid
+project:
+  appid: wx731c1d7007f59db4
+  secret: 19b6cc09bfc107dcedef4ea10413155f
+
+#日志
+logging:
+  level:
+    root: info
