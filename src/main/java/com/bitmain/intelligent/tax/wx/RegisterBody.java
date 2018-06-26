@@ -1,4 +1,4 @@
-package com.bitmain.intelligent.tax.controller.requestbody;
+package com.bitmain.intelligent.tax.wx;
 
 public class RegisterBody {
     private String opendId;

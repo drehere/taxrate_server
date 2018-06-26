@@ -1,6 +1,9 @@
 package com.bitmain.intelligent.tax.service;
 
-import com.bitmain.intelligent.tax.controller.requestbody.RegisterBody;
+import com.bitmain.intelligent.tax.database.WXGroupMapper;
+import com.bitmain.intelligent.tax.database.entity.WXGroup;
+import com.bitmain.intelligent.tax.wx.GroupData;
+import com.bitmain.intelligent.tax.wx.RegisterBody;
 import com.bitmain.intelligent.tax.database.UserMapper;
 import com.bitmain.intelligent.tax.database.entity.WXUser;
 import com.bitmain.intelligent.tax.http.response.WxLoginResponse;
@@ -15,7 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
 
 @Service
 public class WXService {
@@ -31,15 +38,14 @@ public class WXService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private WXGroupMapper wxGroupMapper;
+
 
     @Value("${project.appid}")
     private String appID;
     @Value("${project.secret}")
     private String secret;
-//    写错，下面是网页程序授权的
-//    private static final String wxBaseUrl = "https://api.weixin.qq.com/sns/oauth2";
-//    private static final String accessToken = wxBaseUrl + "/access_token";
-//    private static final String userinfo = wxBaseUrl + "/userinfo";
 
     private static final String wxXCXTokenUrl="https://api.weixin.qq.com/sns/jscode2session?";
 
@@ -59,7 +65,7 @@ public class WXService {
                     userMapper.insert(wxUser);
                 }else{
                     wxUser.setSessionKey(wxLoginResponse.getSessionKey());
-                    userMapper.updateSeesionKey(wxUser);
+                    userMapper.updateSessionKey(wxUser);
                 }
             }
         }catch(Exception e){
@@ -86,6 +92,50 @@ public class WXService {
         wxUser.setUnionID(registerBody.getUnionId());
         userMapper.updateUserInfo(wxUser);
         return wxUser;
+    }
+
+    @Transactional
+    public WXUser getWxuser(String openID){
+        return userMapper.getOne(openID);
+    }
+
+    @Transactional
+    public WXGroup analyseGroupInfo(String openID, String encryptedData, String iv){
+        WXUser wxUser=userMapper.getOne(openID);
+        if(wxUser==null||TextUtil.isEmpty(wxUser.getSessionKey())){
+            logger.info("analyseGroupInfo error no users with openid "+openID);
+            return null;
+        }
+        String result=WXCore.decrypt(appID,encryptedData,wxUser.getSessionKey(),iv);
+        if(TextUtil.isEmpty(result)){
+            logger.info("analyseGroupInfo error data fail");
+            return null;
+        }
+        logger.info("[WXService analyseGroupInfo]"+result);
+        GroupData groupData=gson.fromJson(result,GroupData.class);
+        if(groupData==null){
+            return null;
+        }
+        WXGroup wxGroup=wxGroupMapper.getOne(groupData.getOpenGId());
+        if(wxGroup==null){
+            wxGroup=new WXGroup();
+            wxGroup.setGroupID(groupData.getOpenGId());
+            wxGroupMapper.insert(wxGroup);
+            logger.info("[WXService analyseGroupInfo ] insert group "+wxGroup.getId());
+        }
+        wxGroupMapper.insertGroupUserIfNotExist(wxGroup.getId(),wxUser.getId());
+        return wxGroup;
+    }
+
+
+    public List<WXUser> loadUsersByGroupID(String groupID,String openID){
+        WXGroup wxGroup = wxGroupMapper.getOne(groupID);
+        if(wxGroup==null){
+            logger.info("[WXService loadUsersByGroupID ] groupID  "+groupID +" 不存在");
+            return null;
+        }
+        List<WXUser> wxUsers= wxGroupMapper.findUsersByGroupID(Collections.singletonMap("groupID",groupID));
+        return wxUsers;
     }
 
 

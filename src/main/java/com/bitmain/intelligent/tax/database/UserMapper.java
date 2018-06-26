@@ -16,7 +16,7 @@ public interface UserMapper {
     long insert(WXUser user);
 
     @Update("UPDATE wxuser SET sessionKey=#{sessionKey} WHERE id =#{id} ")
-    void updateSeesionKey(WXUser user);
+    void updateSessionKey(WXUser user);
 
     @Update("UPDATE wxuser SET nickName=#{nickName},city=#{city},gender=#{gender},avatarUrl=#{avatarUrl},unionID=#{unionID} " +
             "where id=#{id}")

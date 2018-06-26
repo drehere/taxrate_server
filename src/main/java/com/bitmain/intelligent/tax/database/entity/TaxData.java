@@ -1,13 +1,30 @@
-package com.bitmain.intelligent.tax.Bean;
+package com.bitmain.intelligent.tax.database.entity;
 
-public class TaxResult {
-
+public class TaxData {
+    private long id;
+    private long userID;
     private int grossPay;
     private int fee;
     private int threshold;
     private int tax;
     private int realSalary;
     private String resultDesc;
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getUserID() {
+        return userID;
+    }
+
+    public void setUserID(long userID) {
+        this.userID = userID;
+    }
 
     public int getGrossPay() {
         return grossPay;

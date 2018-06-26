@@ -2,7 +2,7 @@ package com.bitmain.intelligent.tax.database.entity;
 
 
 public class WXUser {
-    private int id;
+    private long id;
     private String openID;
     private String sessionKey;
     private String nickName;
@@ -12,11 +12,17 @@ public class WXUser {
     private String avatarUrl;
     private String phone;
 
-    public int getId() {
+
+    //计算数据
+    private TaxData taxData;
+
+
+
+    public long getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -82,5 +88,13 @@ public class WXUser {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+    public TaxData getTaxData() {
+        return taxData;
+    }
+
+    public void setTaxData(TaxData taxData) {
+        this.taxData = taxData;
     }
 }

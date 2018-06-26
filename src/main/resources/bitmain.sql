@@ -1,18 +1,21 @@
-create table wxuser
+create table taxdata
 (
 	id int auto_increment
 		primary key,
-	openID varchar(100) not null,
-	phone int null,
-	nickName varchar(100) null,
-	city varchar(40) null,
-	unionID varchar(100) null,
-	gender varchar(20) null,
-	avatarUrl varchar(300) null,
-	sessionKey varchar(100) null,
-	constraint wxuser_openid_uindex
-		unique (openID)
+	userID int null,
+	grossPay int null,
+	fee int null,
+	tax int null,
+	realSalary int null,
+	resultDesc varchar(100) null,
+	updateTime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	constraint taxdata_wxuser_id_fk
+		foreign key (userID) references wxuser (id)
 )
-comment '微信用户表'
+comment '税率计算数据表'
+;
+
+create index taxdata_wxuser_id_fk
+	on taxdata (userID)
 ;
 

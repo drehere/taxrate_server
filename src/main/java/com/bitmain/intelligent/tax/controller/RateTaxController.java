@@ -2,13 +2,18 @@ package com.bitmain.intelligent.tax.controller;
 
 import com.bitmain.intelligent.tax.Bean.ResponseBean;
 import com.bitmain.intelligent.tax.Bean.TaxResult;
+import com.bitmain.intelligent.tax.database.entity.WXGroup;
 import com.bitmain.intelligent.tax.database.entity.WXUser;
+import com.bitmain.intelligent.tax.policy.ResultInterpretationKt;
 import com.bitmain.intelligent.tax.service.TaxService;
 import com.bitmain.intelligent.tax.service.WXService;
+import org.apache.catalina.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * rest api:
@@ -34,14 +39,24 @@ public class RateTaxController {
                                   @RequestParam("fee") int fee,
                                   @RequestParam("threshold") int threshold,
                                   @RequestHeader("openID") String openID) {
-        int result=taxService.deductionTax(grossPay-fee,threshold);
+
+        WXUser wxUser=wxService.getWxuser(openID);
+        if(wxUser==null){
+            return ResponseBean.newError(9999,"非法用户");
+        }
+        int tax=taxService.deductionTax(grossPay-fee,threshold);
         TaxResult taxResult=new TaxResult();
-        taxResult.setResult(result);
+        taxResult.setTax(tax);
         taxResult.setFee(fee);
         taxResult.setGrossPay(grossPay);
         taxResult.setThreshold(threshold);
-        taxResult.setRealSalary(grossPay-fee-result);
-        taxResult.setResultDesc("你总共减少了10顿肯德基");
+        taxResult.setRealSalary(grossPay-fee-tax);
+        taxResult.setResultDesc(ResultInterpretationKt.interpretation(taxResult.getTax()));
+        taxService.storeCalculateData(wxUser,taxResult);
+
+
+
+
         return ResponseBean.newSuccess(taxResult);
     }
 
@@ -60,5 +75,26 @@ public class RateTaxController {
 
         WXUser wxUser = wxService.registerWXUserInfo(openID,encryptedData,iv);
         return ResponseBean.newSuccess(wxUser);
+    }
+    @PostMapping(path = "/uploadShareInfo")
+    public ResponseBean uploadShareInfo(@RequestParam("encryptedData") String encryptedData,
+                                         @RequestParam("iv") String iv, @RequestHeader("openID") String openID) {
+
+        WXGroup wxGroup=wxService.analyseGroupInfo(openID,encryptedData,iv);
+        if(wxGroup!=null) {
+            return ResponseBean.newSuccess(wxGroup);
+        }else{
+            return ResponseBean.newError(9999,"分析群组数据失败");
+        }
+    }
+
+    @PostMapping(path="/getRankList")
+    public ResponseBean loadGroupUsers(@RequestParam("groupID") String groupID,@RequestHeader("openID") String openID){
+        List<WXUser> users=wxService.loadUsersByGroupID(groupID,openID);
+        if(users!=null){
+            return ResponseBean.newSuccess(users);
+        }else{
+            return ResponseBean.newError(9999,"获取排行榜数据失败");
+        }
     }
 }

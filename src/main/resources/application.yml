@@ -34,3 +34,4 @@ project:
 logging:
   level:
     root: info
+    com.bitmain.intelligent.tax.database: DEBUG
