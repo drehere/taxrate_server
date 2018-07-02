@@ -14,5 +14,4 @@ fun interpretation(result: Int): String {
         else -> "你扣税太多了，我都算不过来了～"
     }
 
-
 }

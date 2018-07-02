@@ -12,8 +12,8 @@ import java.util.Map;
 
 @Component
 public interface WXGroupMapper {
-    @Select("SELECT * FROM wxgroup WHERE groupid = #{groupID)}")
-    WXGroup getOne(String groupID);
+    @Select("SELECT * FROM wxgroup WHERE groupid = #{groupID}")
+    WXGroup getOne(@Param(value="groupID") String groupID);
 
     @Insert("INSERT INTO wxgroup(groupID) VALUES(#{groupID})")
     @Options(useGeneratedKeys = true)
@@ -36,8 +36,8 @@ public interface WXGroupMapper {
     List<WXUser> findUsersByGroupID(Map<String, Object> params);
 
 
-    @Insert("INSERT INTO wxgroup_user(group_id,user_id) select #{arg0},#{arg1} from dual where not exists (select * from wxgroup_user where  group_id=#{arg0} and  user_id=#{arg1})")
-    long insertGroupUserIfNotExist(long groupID, long userID);
+    @Insert("INSERT INTO wxgroup_user(group_id,user_id) select #{groupID},#{userID} from dual where not exists (select * from wxgroup_user where  group_id=#{groupID} and  user_id=#{userID})")
+    long insertGroupUserIfNotExist(@Param(value="groupID") long groupID,@Param(value="userID") long userID);
 
 //    做外连接查询使用
 //    @SelectProvider(type = GroupUsersDaoProvider.class, method = "findUsersByGroupID")
