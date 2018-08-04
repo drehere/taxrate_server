@@ -15,3 +15,9 @@ fun interpretation(result: Int): String {
     }
 
 }
+
+fun interpretationDiff(tax: Int, oldTax: Int): String {
+    val diff=oldTax-tax
+    return "本次个税方案修改，你大概多得${diff}元"
+}
+

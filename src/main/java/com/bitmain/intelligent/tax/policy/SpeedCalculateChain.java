@@ -17,7 +17,7 @@ public class SpeedCalculateChain implements Chain {
     @Override
     public int stageProcess(int salary) {
 
-        if (index > calculateStages.size()) {
+        if (index >= calculateStages.size()) {
             return -1;
         }
         CalculateStage calculateStage = calculateStages.get(index++);
@@ -30,7 +30,7 @@ public class SpeedCalculateChain implements Chain {
     }
 
 
-    public static SpeedCalculateChain standarChain() {
+    public static SpeedCalculateChain standardChain() {
         Builder builder = new Builder();
         builder.addCalculateStage(new SpeedCalculateStage(0, 1500, 0.03f, 0));
         builder.addCalculateStage(new SpeedCalculateStage(1500, 4500, .1f, 105));
@@ -39,6 +39,18 @@ public class SpeedCalculateChain implements Chain {
         builder.addCalculateStage(new SpeedCalculateStage(35000, 55000, .3f, 2755));
         builder.addCalculateStage(new SpeedCalculateStage(55000, 80000, .35f, 5505));
         builder.addCalculateStage(new SpeedCalculateStage(80000, Integer.MAX_VALUE, .45f, 13505));
+        return builder.build();
+    }
+
+    public static SpeedCalculateChain latestChain(){
+        Builder builder = new Builder();
+        builder.addCalculateStage(new SpeedCalculateStage(0, 3000, 0.03f, 0));
+        builder.addCalculateStage(new SpeedCalculateStage(3000, 12000, .1f, 210));
+        builder.addCalculateStage(new SpeedCalculateStage(12000, 25000, .2f, 1410));
+        builder.addCalculateStage(new SpeedCalculateStage(25000, 35000, .25f, 2660));
+        builder.addCalculateStage(new SpeedCalculateStage(35000, 55000, .3f, 4410));
+        builder.addCalculateStage(new SpeedCalculateStage(55000, 80000, .35f, 7160));
+        builder.addCalculateStage(new SpeedCalculateStage(80000, Integer.MAX_VALUE, .45f, 15160));
         return builder.build();
     }
 

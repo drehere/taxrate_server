@@ -39,24 +39,12 @@ public class RateTaxController {
                                   @RequestParam("fee") int fee,
                                   @RequestParam("threshold") int threshold,
                                   @RequestHeader("openID") String openID) {
-
         WXUser wxUser=wxService.getWxuser(openID);
         if(wxUser==null){
             return ResponseBean.newError(9999,"非法用户");
         }
-        int tax=taxService.deductionTax(grossPay-fee,threshold);
-        TaxResult taxResult=new TaxResult();
-        taxResult.setTax(tax);
-        taxResult.setFee(fee);
-        taxResult.setGrossPay(grossPay);
-        taxResult.setThreshold(threshold);
-        taxResult.setRealSalary(grossPay-fee-tax);
-        taxResult.setResultDesc(ResultInterpretationKt.interpretation(taxResult.getTax()));
+        TaxResult taxResult=taxService.deductionTax(grossPay,fee,threshold);
         taxService.storeCalculateData(wxUser,taxResult);
-
-
-
-
         return ResponseBean.newSuccess(taxResult);
     }
 
@@ -78,7 +66,7 @@ public class RateTaxController {
     }
     @PostMapping(path = "/uploadShareInfo")
     public ResponseBean uploadShareInfo(@RequestParam("encryptedData") String encryptedData,
-                                         @RequestParam("iv") String iv, @RequestHeader("openID") String openID) {
+                                        @RequestParam("iv") String iv, @RequestHeader("openID") String openID) {
 
         WXGroup wxGroup=wxService.analyseGroupInfo(openID,encryptedData,iv);
         if(wxGroup!=null) {
